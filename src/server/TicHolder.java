@@ -1,12 +1,15 @@
 package server;
 
+import server.model.DataContainer;
 import server.model.Game;
 import server.model.Point;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
 
+/**
+ * Holder connection with current user
+ */
 public class TicHolder implements Runnable {
     private Socket socket;
     private ObjectOutputStream outputStream;
@@ -56,13 +59,14 @@ public class TicHolder implements Runnable {
         }
     }
 
+    /**
+     * lead interaction with user until the socket is connected
+     */
     private void interaction() {
-        String[][] gameField = game.initField();
-        String report = null;
+        DataContainer gameField = game.initField();
 
         while (true) {
             try {
-                System.out.println(Arrays.deepToString(gameField));
                 outputStream.writeObject(gameField);
                 outputStream.flush();
                 outputStream.reset();
@@ -93,9 +97,7 @@ public class TicHolder implements Runnable {
             }
 
             try {
-                System.out.println("server pre-reading");
                 int[] pointData = (int[]) inputStream.readObject();
-                System.out.println("server post-reading");
                 game.doStep(new Point(pointData[0], pointData[1]));
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -103,7 +105,6 @@ public class TicHolder implements Runnable {
                 e.printStackTrace();
             }
 
-            report = game.getResume();
             gameField = game.getFieldData();
         }
     }

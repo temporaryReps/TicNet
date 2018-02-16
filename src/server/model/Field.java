@@ -42,6 +42,7 @@ public class Field {
     }
 
     public void shoot(Point point, Type who) {
+        report = "Играем";
         if (point.getX() > SIZE || point.getY() > SIZE
                 || point.getX() < 0 || point.getY() < 0) {
             return;
@@ -51,7 +52,6 @@ public class Field {
             report = "Ячейка уже занята";
             return;
         }
-        report = "Играем!";
         cells[point.getX()][point.getY()] = who;
     }
 

@@ -14,16 +14,13 @@ public class Game {
         field.init();
     }
 
-    public String getResume() {
-        return resume;
-    }
-
     public void doStep(Point userShot) {
         field.shoot(userShot, Field.Type.X);
         resume = field.getReport();
+        fieldData = field.getFieldData();
+
         if (field.whoIsWinner() == Field.Type.X) {
             resume = "Победил " + Field.Type.X;
-            fieldData = field.getFieldData();
             return;
         }
 
@@ -31,15 +28,21 @@ public class Game {
         if (field.whoIsWinner() == Field.Type.O) {
             resume = "Победил " + Field.Type.O;
         }
-        fieldData = field.getFieldData();
     }
 
-
-    public String[][] initField() {
-        return field.init();
+    /**
+     * initialize field before game is started
+     * @return data to class which responsible for connection with user
+     */
+    public DataContainer initField() {
+        return new DataContainer(field.init(), resume);
     }
 
-    public String[][] getFieldData() {
-        return fieldData;
+    /**
+     * get field after game's step was done
+     * @return data to class which responsible for connection with user
+     */
+    public DataContainer getFieldData() {
+        return new DataContainer(fieldData, resume);
     }
 }
