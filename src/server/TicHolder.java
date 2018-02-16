@@ -65,6 +65,7 @@ public class TicHolder implements Runnable {
                 System.out.println(Arrays.deepToString(gameField));
                 outputStream.writeObject(gameField);
                 outputStream.flush();
+                outputStream.reset();
             } catch (IOException e) {
                 e.printStackTrace();
                 if (outputStream != null) {
