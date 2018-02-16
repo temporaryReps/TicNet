@@ -1,7 +1,5 @@
 package server.model;
 
-import server.controller.Controller;
-
 public class Field {
     public static final int SIZE = 3;
 
@@ -11,18 +9,19 @@ public class Field {
 
     private Type[][] cells = new Type[SIZE][SIZE];
     private String[][] cellsResult = new String[SIZE][SIZE];
-    private Controller controller = Controller.getInstance();
+    private String report;
 
-    public void init() {
+    public String[][] init() {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 cells[i][j] = Type.NONE;
             }
         }
-        getFieldData();
+
+        return getFieldData();
     }
 
-    public void getFieldData() {
+    public String[][] getFieldData() {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 switch (cells[i][j]) {
@@ -39,7 +38,7 @@ public class Field {
             }
         }
 
-        controller.sendFileData(cellsResult);
+        return cellsResult;
     }
 
     public void shoot(Point point, Type who) {
@@ -49,11 +48,10 @@ public class Field {
         }
 
         if (!cells[point.getX()][point.getY()].equals(Type.NONE)) {
-            controller.setResume("Ячейка уже занята");
+            report = "Ячейка уже занята";
             return;
         }
-
-        controller.setResume("Играем!");
+        report = "Играем!";
         cells[point.getX()][point.getY()] = who;
     }
 
@@ -83,5 +81,9 @@ public class Field {
         }
 
         return cells[0][2] == t && cells[1][1] == t && cells[2][0] == t;
+    }
+
+    public String getReport() {
+        return report;
     }
 }

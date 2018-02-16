@@ -1,7 +1,6 @@
 package client.view;
 
 import client.controller.Controller;
-import client.model.Point;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,7 +41,7 @@ public class GameWindow extends JFrame implements Controller.Updatable{
                     public void actionPerformed(ActionEvent e) {
                         String buttonText = e.getActionCommand();
                         System.out.printf("Button: %s, x: %d, y: %d%n", buttonText, finalJ, finalI);
-                        controller.doShoot(new Point(finalI, finalJ));
+                        controller.doShoot(new int[]{finalI, finalJ});
                     }
                 });
 

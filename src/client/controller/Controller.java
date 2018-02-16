@@ -1,7 +1,5 @@
 package client.controller;
 
-import client.model.Point;
-
 public class Controller {
     private static Controller instance;
     private Updatable window;
@@ -26,7 +24,7 @@ public class Controller {
         window.update(data);
     }
 
-    public void doShoot(Point point) {
+    public void doShoot(int[] point) {
         receiver.newShot(point);
     }
 
@@ -35,7 +33,7 @@ public class Controller {
     }
 
     public interface Receiver {
-        void newShot(Point shot);
+        void newShot(int[] shot);
     }
 
     public interface Updatable {

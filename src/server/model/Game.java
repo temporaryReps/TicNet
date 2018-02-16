@@ -1,42 +1,45 @@
 package server.model;
 
-import server.controller.Controller;
-
 public class Game {
-    private Controller controller;
     private Field field;
     private Computer computer;
-    private User user;
+    private String resume;
+    private String[][] fieldData;
 
     public Game() {
-        controller = Controller.getInstance();
-        user = new User();
         field = new Field();
         computer = new Computer();
+        resume = "Играем";
+
         field.init();
     }
 
-    public void doStep() {
-        field.shoot(user.getShootPoint(), Field.Type.X);
-//        field.getFieldData();
+    public String getResume() {
+        return resume;
+    }
+
+    public void doStep(Point userShot) {
+        field.shoot(userShot, Field.Type.X);
+        resume = field.getReport();
         if (field.whoIsWinner() == Field.Type.X) {
-            controller.setResume("Победил " + Field.Type.X);
-            field.getFieldData();
+            resume = "Победил " + Field.Type.X;
+            fieldData = field.getFieldData();
             return;
         }
 
         field.shoot(computer.getShootPoint(), Field.Type.O);
         if (field.whoIsWinner() == Field.Type.O) {
-            controller.setResume("Победил " + Field.Type.O);
+            resume = "Победил " + Field.Type.O;
         }
-        field.getFieldData();
+        fieldData = field.getFieldData();
     }
 
-    public void initField() {
-        field.getFieldData();
+
+    public String[][] initField() {
+        return field.init();
     }
 
-    public void setUserStep(Point shot) {
-        user.setShotPoint(shot);
+    public String[][] getFieldData() {
+        return fieldData;
     }
 }

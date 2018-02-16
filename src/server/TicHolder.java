@@ -1,34 +1,29 @@
 package server;
 
-import server.controller.Controller;
+import server.model.Game;
 import server.model.Point;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 
-public class TicHolder implements Runnable, Controller.Receiver {
+public class TicHolder implements Runnable {
     private Socket socket;
-    private Controller controller;
-
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
 
+    private Game game;
+
     public TicHolder(Socket socket) {
         this.socket = socket;
-        controller = Controller.getInstance();
-        controller.setReceiver(this);
-
+        game = new Game();
         new Thread(this).start();
     }
 
     @Override
     public void run() {
         initConnection(socket);
-    }
-
-    @Override
-    public void receiver(String[][] fieldData) {
-        interaction(fieldData);
+        interaction();
     }
 
     private void initConnection(Socket socket) {
@@ -37,49 +32,78 @@ public class TicHolder implements Runnable, Controller.Receiver {
             inputStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
             if (outputStream != null) {
                 try {
                     outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
                 }
             }
             if (inputStream != null) {
                 try {
                     inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
                 }
             }
             if (socket != null) {
                 try {
                     socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
                 }
             }
         }
-
-        controller.initField();
     }
 
-    private void interaction(String[][] fieldData) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    System.out.println(fieldData);
-                    outputStream.writeObject(fieldData);
-                    Point clientStep = (Point) inputStream.readObject();
-                    controller.setUserStep(clientStep);
-                    controller.nextStep();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+    private void interaction() {
+        String[][] gameField = game.initField();
+        String report = null;
+
+        while (true) {
+            try {
+                System.out.println(Arrays.deepToString(gameField));
+                outputStream.writeObject(gameField);
+                outputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+                if (outputStream != null) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                if (socket != null) {
+                    try {
+                        socket.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                return;
             }
-        }).start();
+
+            try {
+                System.out.println("server pre-reading");
+                int[] pointData = (int[]) inputStream.readObject();
+                System.out.println("server post-reading");
+                game.doStep(new Point(pointData[0], pointData[1]));
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            report = game.getResume();
+            gameField = game.getFieldData();
+        }
     }
 }

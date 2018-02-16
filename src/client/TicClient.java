@@ -1,14 +1,14 @@
 package client;
 
 import client.controller.Controller;
-import client.model.Point;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class TicClient implements Controller.Receiver {
     private static final String SITE = "localhost";
-    private static final int PORT = 8060;
+    private static final int PORT = 8080;
     private Socket socket;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
@@ -21,7 +21,7 @@ public class TicClient implements Controller.Receiver {
     }
 
     @Override
-    public void newShot(Point shot) {
+    public void newShot(int[] shot) {
         interaction(shot);
     }
 
@@ -30,10 +30,12 @@ public class TicClient implements Controller.Receiver {
         try {
             socket = new Socket(SITE, PORT);
             System.out.println(socket);
+            outputStream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+            outputStream.flush();
+            System.out.println(outputStream);
             inputStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
             System.out.println(inputStream);
-            outputStream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-            System.out.println(outputStream);
+
         } catch (IOException e) {
             e.printStackTrace();
 
@@ -59,20 +61,33 @@ public class TicClient implements Controller.Receiver {
                 e1.printStackTrace();
             }
         }
+        readData();
         System.out.println("end");
     }
 
-    private void interaction(Point shot) {
-            try {
-                String[][] fieldData = (String[][]) inputStream.readObject();
-                controller.setData(fieldData);
+    private void interaction(int[] shot) {
+        try {
+            System.out.println(outputStream);
+            outputStream.writeObject(shot);
+            outputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        readData();
+    }
 
-                System.out.println(outputStream);
-                outputStream.writeObject(shot);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    private void readData() {
+        String[][] fieldData = null;
+        try {
+            System.out.println("pre-read");
+            fieldData = (String[][]) inputStream.readObject();
+            System.out.println(Arrays.deepToString(fieldData));
+            System.out.println("post-read");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        controller.setData(fieldData);
     }
 }

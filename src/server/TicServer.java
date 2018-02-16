@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class TicServer {
-    private static final int PORT = 8060;
+    private static final int PORT = 8080;
 
     public void connect() {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
