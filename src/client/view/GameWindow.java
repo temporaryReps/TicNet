@@ -1,7 +1,6 @@
 package client.view;
 
 import client.controller.Controller;
-import client.model.Point;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,8 +15,8 @@ public class GameWindow extends JFrame implements Controller.Updatable{
     private Controller controller;
 
     @Override
-    public void update(String[][] data) {
-        updateUI(data);
+    public void update(String[][] field, String report) {
+        updateUI(field, report);
     }
 
     public void init() {
@@ -42,7 +41,7 @@ public class GameWindow extends JFrame implements Controller.Updatable{
                     public void actionPerformed(ActionEvent e) {
                         String buttonText = e.getActionCommand();
                         System.out.printf("Button: %s, x: %d, y: %d%n", buttonText, finalJ, finalI);
-                        controller.doShoot(new Point(finalI, finalJ));
+                        controller.doShoot(new int[]{finalI, finalJ});
                     }
                 });
 
@@ -61,29 +60,17 @@ public class GameWindow extends JFrame implements Controller.Updatable{
     }
 
     /**
-     * Shows game resume
-     * @param s string that will be shown
+     * updates UI according new data
+     * @param data for cells
+     * @param report
      */
-    public void showResume(String s) {
-        resume.setText(s);
-    }
-
-    /**
-     * add X or O into sell
-     * @param x coordinate
-     * @param y coordinate
-     * @param s X or O
-     */
-    public void showCell(int x, int y, String s) {
-        JButton button = buttons[x][y];
-        button.setText(s);
-    }
-
-    private void updateUI(String[][] data) {
+    private void updateUI(String[][] data, String report) {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 buttons[i][j].setText(data[i][j]);
             }
         }
+
+        resume.setText(report);
     }
 }

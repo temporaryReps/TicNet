@@ -1,42 +1,48 @@
 package server.model;
 
-import server.controller.Controller;
-
 public class Game {
-    private Controller controller;
     private Field field;
     private Computer computer;
-    private User user;
+    private String resume;
+    private String[][] fieldData;
 
     public Game() {
-        controller = Controller.getInstance();
-        user = new User();
         field = new Field();
         computer = new Computer();
+        resume = "Играем";
+
         field.init();
     }
 
-    public void doStep() {
-        field.shoot(user.getShootPoint(), Field.Type.X);
-//        field.getFieldData();
+    public void doStep(Point userShot) {
+        field.shoot(userShot, Field.Type.X);
+        resume = field.getReport();
+        fieldData = field.getFieldData();
+
         if (field.whoIsWinner() == Field.Type.X) {
-            controller.setResume("Победил " + Field.Type.X);
-            field.getFieldData();
+            resume = "Победил " + Field.Type.X;
             return;
         }
 
         field.shoot(computer.getShootPoint(), Field.Type.O);
         if (field.whoIsWinner() == Field.Type.O) {
-            controller.setResume("Победил " + Field.Type.O);
+            resume = "Победил " + Field.Type.O;
         }
-        field.getFieldData();
     }
 
-    public void initField() {
-        field.getFieldData();
+    /**
+     * initialize field before game is started
+     * @return data to class which responsible for connection with user
+     */
+    public DataContainer initField() {
+        return new DataContainer(field.init(), resume);
     }
 
-    public void setUserStep(Point shot) {
-        user.setShotPoint(shot);
+    /**
+     * get field after game's step was done
+     * @return data to class which responsible for connection with user
+     */
+    public DataContainer getFieldData() {
+        return new DataContainer(fieldData, resume);
     }
 }
