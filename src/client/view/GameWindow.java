@@ -7,8 +7,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class GameWindow extends JFrame implements Controller.Updatable{
-    public static final int SIZE = 3;
+public class GameWindow extends JFrame implements Controller.Updatable {
+    private static final int SIZE = 3;
 
     private JLabel resume;
     private JButton[][] buttons;
@@ -56,12 +56,16 @@ public class GameWindow extends JFrame implements Controller.Updatable{
         add(jPanel);
         add(resume, BorderLayout.SOUTH);
 
+        // start dialog
+        createDialog();
+
         setVisible(true);
     }
 
     /**
-     * updates UI according new data
-     * @param data for cells
+     * update UI according new data
+     *
+     * @param data   for cells
      * @param report
      */
     private void updateUI(String[][] data, String report) {
@@ -72,5 +76,39 @@ public class GameWindow extends JFrame implements Controller.Updatable{
         }
 
         resume.setText(report);
+    }
+
+    /**
+     * create dialog which asks user if who he want to game
+     */
+    private void createDialog() {
+        JDialog dialog = new JDialog(this);
+        dialog.setTitle("С кем хотите играть?");
+        dialog.setLayout(new GridLayout(1, 2));
+        dialog.setSize(350, 70);
+        dialog.setLocationRelativeTo(null);
+
+        JButton computerButton = new JButton("С компьютером");
+        computerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.setGamer(Controller.COMPUTER);
+                dialog.dispose();
+            }
+        });
+
+        JButton userButton = new JButton("С игроком");
+        userButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.setGamer(Controller.USER);
+                dialog.dispose();
+            }
+        });
+
+        dialog.add(computerButton);
+        dialog.add(userButton);
+
+        dialog.setVisible(true);
     }
 }

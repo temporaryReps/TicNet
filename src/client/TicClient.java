@@ -26,8 +26,24 @@ public class TicClient implements Controller.Receiver {
         interaction(shot);
     }
 
+    @Override
+    public void setGamer(boolean isComputer) {
+        try {
+            outputStream.writeObject(isComputer);
+            outputStream.flush();
+            try {
+                inputStream.readObject();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        readData();
+    }
+
     private void initConnection() {
-        System.out.println("init");
         try {
             socket = new Socket(SITE, PORT);
             outputStream = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
@@ -58,22 +74,20 @@ public class TicClient implements Controller.Receiver {
                 e1.printStackTrace();
             }
         }
-        readData();
     }
 
     /**
      * send point which was selected by user to server
+     *
      * @param shot array of two elements x and y coordinate
      */
     private void interaction(int[] shot) {
         try {
-            System.out.println(outputStream);
             outputStream.writeObject(shot);
             outputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        readData();
     }
 
     /**
@@ -84,16 +98,20 @@ public class TicClient implements Controller.Receiver {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                DataContainer fieldData = null;
-                try {
-                    fieldData = (DataContainer) inputStream.readObject();
-                    System.out.println(Arrays.deepToString(fieldData.getFieldData()));
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                while (true) {
+                    DataContainer fieldData;
+                    try {
+                        fieldData = (DataContainer) inputStream.readObject();
+                        System.out.println(Arrays.deepToString(fieldData.getFieldData()));
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                        return;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                    controller.setData(fieldData);
                 }
-                controller.setData(fieldData);
             }
         }).start();
     }

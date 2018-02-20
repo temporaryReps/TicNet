@@ -3,6 +3,9 @@ package client.controller;
 import server.model.DataContainer;
 
 public class Controller {
+    public static final int COMPUTER = 0; // game with computer
+    public static final int USER = 1; // game with user
+
     private static Controller instance;
     private Updatable window; // GUI class
     private Receiver receiver; // receiver of data from GUI
@@ -44,11 +47,21 @@ public class Controller {
         this.window = window;
     }
 
+    public void setGamer(int gamer) {
+        if (gamer == COMPUTER) {
+            receiver.setGamer(true);
+        } else if (gamer == USER) {
+            receiver.setGamer(false);
+        }
+    }
+
     /**
      * receiver data from user UI
      */
     public interface Receiver {
         void newShot(int[] shot);
+        // establish who is opposite gamer, computer or human
+        void setGamer(boolean isComputer);
     }
 
     /**
